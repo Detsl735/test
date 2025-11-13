@@ -1,6 +1,0 @@
-time="2025-11-12T23:43:48+03:00" level=info msg="server started" func="main.startServer()" file="main.go:44"
-time="2025-11-12T23:44:00+03:00" level=info msg="server stopping..." func="main.startServer()" file="main.go:46"
-time="2025-11-12T23:44:00+03:00" level=info msg="server stopped" func="main.startServer()" file="main.go:55"
-time="2025-11-13T08:51:30+03:00" level=info msg="server started" func="main.startServer()" file="main.go:47"
-time="2025-11-13T08:51:41+03:00" level=info msg="server stopping..." func="main.startServer()" file="main.go:49"
-time="2025-11-13T08:51:41+03:00" level=info msg="server stopped" func="main.startServer()" file="main.go:58"
