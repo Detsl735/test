@@ -1,4 +1,4 @@
-package question
+package answer
 
 import (
 	"errors"
@@ -21,50 +21,44 @@ func NewHandler(logger *logging.Logger, service Service) handlers.Handler {
 }
 
 func (h *handler) Register(router *http.ServeMux) {
-	router.HandleFunc("GET /questions/", h.GetAll)
-	router.HandleFunc("GET /questions/{id}", h.GetById)
-	router.HandleFunc("POST /questions/", h.Create)
-	router.HandleFunc("DELETE /questions/{id}", h.Delete)
-}
-
-func (h *handler) GetAll(w http.ResponseWriter, r *http.Request) {
-	list, err := h.service.GetAll(r.Context())
-	if err != nil {
-		h.logger.Errorf("list questions error: %v", err)
-		handlers.WriteError(w, http.StatusInternalServerError, "internal error")
-		return
-	}
-
-	handlers.WriteJSON(w, http.StatusOK, list)
+	router.HandleFunc("GET /answers/{id}", h.GetById)
+	router.HandleFunc("POST /questions/{id}/answers/", h.Create)
+	router.HandleFunc("DELETE /answers/{id}", h.Delete)
 }
 
 func (h *handler) GetById(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")
 	idUint, err := strconv.ParseUint(idStr, 10, 64)
-	if err != nil {
+	if err != nil || idUint == 0 {
 		handlers.WriteError(w, http.StatusBadRequest, "invalid id")
 		return
 	}
 
-	q, err := h.service.GetByID(r.Context(), uint(idUint))
+	ans, err := h.service.GetByID(r.Context(), uint(idUint))
 	if err != nil {
-		switch {
-		case errors.Is(err, ErrNotFound):
+		if errors.Is(err, ErrNotFound) {
 			handlers.WriteError(w, http.StatusNotFound, err.Error())
-		default:
-			h.logger.Errorf("get question error: %v", err)
-			handlers.WriteError(w, http.StatusInternalServerError, "internal error")
+			return
 		}
+		h.logger.Errorf("get answer error: %v", err)
+		handlers.WriteError(w, http.StatusInternalServerError, "internal error")
 		return
 	}
 
-	handlers.WriteJSON(w, http.StatusOK, q)
+	handlers.WriteJSON(w, http.StatusOK, ans)
 }
 
 func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
-	var req CreateQuestionRequest
+	qidStr := r.PathValue("id")
+	qidUint, err := strconv.ParseUint(qidStr, 10, 64)
+	if err != nil || qidUint == 0 {
+		handlers.WriteError(w, http.StatusBadRequest, "invalid question id")
+		return
+	}
+
+	var req CreateAnswerRequest
 	if err := handlers.ReadJSON(r, req); err != nil {
-		h.logger.Errorf("failed to decode request: %v", err)
+		h.logger.Errorf("failed to decode create answer request: %v", err)
 		handlers.WriteError(w, http.StatusBadRequest, "invalid JSON body")
 		return
 	}
@@ -74,31 +68,35 @@ func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	q, err := h.service.Create(r.Context(), &req)
+	req.QuestionID = uint(qidUint)
+
+	ans, err := h.service.Create(r.Context(), &req)
 	if err != nil {
 		switch {
-		case errors.Is(err, ErrEmptyText):
+		case errors.Is(err, ErrEmptyText),
+			errors.Is(err, ErrEmptyUserID),
+			errors.Is(err, ErrInvalidQuestion):
 			handlers.WriteError(w, http.StatusBadRequest, err.Error())
 		default:
-			h.logger.Errorf("create question error: %v", err)
+			h.logger.Errorf("create answer error: %v", err)
 			handlers.WriteError(w, http.StatusInternalServerError, "internal error")
 		}
 		return
 	}
 
-	handlers.WriteJSON(w, http.StatusCreated, q)
+	handlers.WriteJSON(w, http.StatusCreated, ans)
 }
 
 func (h *handler) Delete(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")
 	idUint, err := strconv.ParseUint(idStr, 10, 64)
-	if err != nil {
+	if err != nil || idUint == 0 {
 		handlers.WriteError(w, http.StatusBadRequest, "invalid id")
 		return
 	}
 
 	if err := h.service.Delete(r.Context(), uint(idUint)); err != nil {
-		h.logger.Errorf("delete question error: %v", err)
+		h.logger.Errorf("delete answer error: %v", err)
 		handlers.WriteError(w, http.StatusInternalServerError, "internal error")
 		return
 	}

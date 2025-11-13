@@ -81,20 +81,20 @@ func TestService_Create_OK(t *testing.T) {
 	svc, storage := newTestService(t)
 	ctx := context.Background()
 
-	req := &CreateQuestionRequest{Text: "  hello  "}
+	req := &CreateQuestionRequest{Text: "  test  "}
 
 	storage.
 		On("Create", mock.Anything, mock.MatchedBy(func(q *Question) bool {
-			return q.Text == "hello"
+			return q.Text == "test"
 		})).
-		Return(&Question{ID: 1, Text: "hello"}, nil)
+		Return(&Question{ID: 1, Text: "test"}, nil)
 
 	q, err := svc.Create(ctx, req)
 
 	require.NoError(t, err)
 	require.NotNil(t, q)
 	assert.Equal(t, uint(1), q.ID)
-	assert.Equal(t, "hello", q.Text)
+	assert.Equal(t, "test", q.Text)
 
 	storage.AssertExpectations(t)
 }

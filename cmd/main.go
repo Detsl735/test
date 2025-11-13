@@ -3,30 +3,50 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"testTask/internal/config"
 	"testTask/internal/question"
+	"testTask/internal/question/db"
+	"testTask/pkg/client/postgres"
 	"testTask/pkg/logging"
 	"time"
 )
 
-func IndexHandler(w http.ResponseWriter, r *http.Request) {
-
-	name := r.PathValue("name")
-	fmt.Fprintf(w, "Hello, %s", name)
-}
-
 func main() {
-	//mux.HandleFunc("GET /{name}", IndexHandler)
 	logger := logging.GetLogger()
+
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		logger.Fatalf("config error: %v", err)
+	}
+
+	ctx := context.Background()
+
+	client, err := postgres.NewClient(ctx, cfg.DSN)
+	if err != nil {
+		logger.Fatalf("postgres init error: %v", err)
+	}
+
+	defer func() {
+		if err := client.Close(); err != nil {
+			logger.Warnf("postgres close error: %v", err)
+		}
+	}()
 
 	mux := http.NewServeMux()
 
-	handler := question.NewHandler(logger)
-	handler.Register(mux)
+	questionStorage := db.NewStorage(client.DB, logger)
+	questionService := question.NewService(questionStorage, logger)
+	questionHandler := question.NewHandler(logger, questionService)
+	questionHandler.Register(mux)
+
+	answerStorage := db.NewStorage(client.DB, logger)
+	answerService := question.NewService(answerStorage, logger)
+	answerHandler := question.NewHandler(logger, answerService)
+	answerHandler.Register(mux)
 
 	startServer(mux)
 }
@@ -34,7 +54,7 @@ func main() {
 func startServer(mux *http.ServeMux) {
 	logger := logging.GetLogger()
 
-	srv := &http.Server{Addr: ":8080", Handler: mux}
+	srv := &http.Server{Addr: os.Getenv("APP_PORT"), Handler: mux}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 

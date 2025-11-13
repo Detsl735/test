@@ -1,0 +1,2 @@
+time="2025-11-14T01:34:28+03:00" level=error msg="failed to get answer id=42: db is down" func="testTask/internal/answer.(*service).GetByID()" file="service.go:68"
+time="2025-11-14T01:34:28+03:00" level=error msg="failed to delete answer id=5: cannot delete" func="testTask/internal/answer.(*service).Delete()" file="service.go:79"
