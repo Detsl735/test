@@ -46,3 +46,19 @@ func (r *repository) Delete(ctx context.Context, id uint) error {
 	}
 	return nil
 }
+
+func (r *repository) FindByQuestionAndUser(ctx context.Context, questionID uint, userID string) (*answer.Answer, error) {
+	var a answer.Answer
+	if err := r.db.WithContext(ctx).
+		Where("question_id = ? AND user_id = ?", questionID, userID).
+		First(&a).Error; err != nil {
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+
+		r.logger.Errorf("failed to find answer by question_id=%d and user_id=%s: %v", questionID, userID, err)
+		return nil, fmt.Errorf("find answer by question and user: %w", err)
+	}
+	return &a, nil
+}

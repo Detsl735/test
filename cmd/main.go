@@ -7,9 +7,11 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"testTask/internal/answer"
+	answerdb "testTask/internal/answer/db"
 	"testTask/internal/config"
 	"testTask/internal/question"
-	"testTask/internal/question/db"
+	questiondb "testTask/internal/question/db"
 	"testTask/pkg/client/postgres"
 	"testTask/pkg/logging"
 	"time"
@@ -38,14 +40,14 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	questionStorage := db.NewStorage(client.DB, logger)
+	questionStorage := questiondb.NewStorage(client.DB, logger)
 	questionService := question.NewService(questionStorage, logger)
 	questionHandler := question.NewHandler(logger, questionService)
 	questionHandler.Register(mux)
 
-	answerStorage := db.NewStorage(client.DB, logger)
-	answerService := question.NewService(answerStorage, logger)
-	answerHandler := question.NewHandler(logger, answerService)
+	answerStorage := answerdb.NewStorage(client.DB, logger)
+	answerService := answer.NewService(answerStorage, logger)
+	answerHandler := answer.NewHandler(logger, answerService)
 	answerHandler.Register(mux)
 
 	startServer(mux)

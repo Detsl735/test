@@ -6,17 +6,17 @@ services:
     container_name: test-task-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: testTask
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
     ports:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
-      interval: 10s
-      timeout: 5s
+      test: ["CMD-SHELL", "pg_isready -U postgres -d testTask"]
+      interval: 5s
+      timeout: 3s
       retries: 10
 
   migrate:
@@ -25,12 +25,14 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    env_file:
-      - .env
-    environment:
-      DB_HOST: db
-    working_dir: /app
-    command: ["make", "migrate-up"]
+    command: [
+      "goose",
+      "-dir", "/app/migrations",
+      "postgres",
+      "${DSN_PG}",
+      "up"
+    ]
+    restart: "no"
 
   app:
     build: .
@@ -42,6 +44,11 @@ services:
       - .env
     environment:
       DB_HOST: db
+      DB_USER: postgres
+      DB_PASSWORD: secret
+      DB_NAME: testTask
+      DB_PORT: 5432
+      DB_SSLMODE: disable
       APP_PORT: ":8080"
     ports:
       - "8080:8080"

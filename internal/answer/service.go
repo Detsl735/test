@@ -13,6 +13,7 @@ var (
 	ErrEmptyUserID     = errors.New("user id is empty")
 	ErrInvalidQuestion = errors.New("question id is invalid")
 	ErrNotFound        = errors.New("answer not found")
+	ErrAlreadyAnswered = errors.New("user has already answered this question")
 )
 
 type Service interface {
@@ -45,6 +46,15 @@ func (s *service) Create(ctx context.Context, req *CreateAnswerRequest) (*Answer
 	}
 	if text == "" {
 		return nil, ErrEmptyText
+	}
+
+	existed, err := s.storage.FindByQuestionAndUser(ctx, req.QuestionID, userID)
+	if err != nil {
+		s.logger.Errorf("failed to check existing answer: %v", err)
+		return nil, err
+	}
+	if existed != nil {
+		return nil, ErrAlreadyAnswered
 	}
 
 	a := &Answer{

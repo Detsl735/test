@@ -1,13 +1,13 @@
-FROM golang:1.22-alpine AS builder
+FROM golang:1.25.4-alpine AS builder
 
 WORKDIR /app
 
 RUN apk add --no-cache git make
 
-COPY go.mod go.sum ./
+COPY . .
 RUN go mod download
 
-COPY . .
+
 
 RUN go install github.com/pressly/goose/v3/cmd/goose@latest
 

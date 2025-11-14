@@ -63,7 +63,7 @@ func (h *handler) GetById(w http.ResponseWriter, r *http.Request) {
 
 func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
 	var req CreateQuestionRequest
-	if err := handlers.ReadJSON(r, req); err != nil {
+	if err := handlers.ReadJSON(r, &req); err != nil {
 		h.logger.Errorf("failed to decode request: %v", err)
 		handlers.WriteError(w, http.StatusBadRequest, "invalid JSON body")
 		return

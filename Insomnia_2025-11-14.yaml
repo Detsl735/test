@@ -1,0 +1,178 @@
+type: collection.insomnia.rest/5.0
+name: TestTask API
+meta:
+  id: wrk_1168a2056a1847e6aeac9a0e4f018bf3
+  created: 1763075494225
+  modified: 1763075494225
+  description: ""
+collection:
+  - name: Questions
+    meta:
+      id: fld_4072a7a4bd6d441b99bc0cbf756b7fbe
+      created: 1763075494228
+      modified: 1763075494228
+      sortKey: -1763075494228
+      description: ""
+    children:
+      - url: "{{ base_url }}/questions/"
+        name: Get all questions
+        meta:
+          id: req_ca817331432d436b9b6a71b8028916ef
+          created: 1763075494229
+          modified: 1763078844312
+          isPrivate: false
+          description: ""
+          sortKey: -1763075494229
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ base_url }}/questions/1"
+        name: Get question by ID
+        meta:
+          id: req_d997d5fb8fb540b5b6ca6f34cb664fc4
+          created: 1763075494230
+          modified: 1763075494230
+          isPrivate: false
+          description: ""
+          sortKey: -1763075494230
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ base_url }}/questions/"
+        name: Create question
+        meta:
+          id: req_e32f6767060349289171bd68ec368c95
+          created: 1763075494231
+          modified: 1763082266803
+          isPrivate: false
+          description: ""
+          sortKey: -1763075494231
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "text": "Who are you?"
+            }
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ base_url }}/questions/1"
+        name: Delete question
+        meta:
+          id: req_ee29414492a144d38834251ef542c630
+          created: 1763075494232
+          modified: 1763083536504
+          isPrivate: false
+          description: ""
+          sortKey: -1763075494232
+        method: DELETE
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Answers
+    meta:
+      id: fld_55afe0d8f2e94a17b81102b5d3a98a3f
+      created: 1763075494233
+      modified: 1763075494233
+      sortKey: -1763075494233
+      description: ""
+    children:
+      - url: "{{ base_url }}/questions/1/answers/"
+        name: Create answer
+        meta:
+          id: req_ad32baf995ee4566bd5d3a7999185cae
+          created: 1763075494234
+          modified: 1763083547148
+          isPrivate: false
+          description: ""
+          sortKey: -1763075494234
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"user_id": "1",
+              "text": "I am a developer!"
+            }
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ base_url }}/answers/1"
+        name: Get answers for question
+        meta:
+          id: req_fcd467946d214bffa0c5d1af42792443
+          created: 1763075494234
+          modified: 1763083542786
+          isPrivate: false
+          description: ""
+          sortKey: -1763075494234
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ base_url }}/answers/1"
+        name: Delete answer
+        meta:
+          id: req_bcd4a84ad5f9418e9c3e1d335cac460e
+          created: 1763075494235
+          modified: 1763075494235
+          isPrivate: false
+          description: ""
+          sortKey: -1763075494235
+        method: DELETE
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_320c0307b1f673f865e84119b4ecb222744f9020
+    created: 1763075494238
+    modified: 1763075494238
+environments:
+  name: Base Environment
+  meta:
+    id: env_6dfeb84efc2d4bdc869144d3d8b13851
+    created: 1763075494227
+    modified: 1763075494227
+    isPrivate: false
+  data:
+    base_url: http://localhost:8080

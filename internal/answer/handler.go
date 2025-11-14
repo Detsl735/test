@@ -57,7 +57,7 @@ func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var req CreateAnswerRequest
-	if err := handlers.ReadJSON(r, req); err != nil {
+	if err := handlers.ReadJSON(r, &req); err != nil {
 		h.logger.Errorf("failed to decode create answer request: %v", err)
 		handlers.WriteError(w, http.StatusBadRequest, "invalid JSON body")
 		return
